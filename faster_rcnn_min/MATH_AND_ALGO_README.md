@@ -55,6 +55,7 @@ IoU is used for:
 At each feature-map location, several anchor templates are placed.
 
 For size $s$ and aspect ratio $r = h/w$:
+- $s = \sqrt{w*h}$
 - $w = s / \sqrt{r}$
 - $h = s \sqrt{r}$
 
