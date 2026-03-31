@@ -98,7 +98,7 @@ class AnchorGenerator(nn.Module):
         self,
         sizes: Tuple[int, ...] = (32, 64, 128),
         aspect_ratios: Tuple[float, ...] = (0.5, 1.0, 2.0),
-        stride: int = 16,
+        stride: int = 16, # must match backbone stride for correct anchor placement, used to map feature cell centers to image coordinates
     ):
         super().__init__()
         self.sizes = sizes
@@ -219,7 +219,7 @@ class MinimalFasterRCNN(nn.Module):
         self.image_size = image_size
 
         self.backbone = TinyBackbone(out_channels=backbone_out_channels)
-        self.anchor_gen = AnchorGenerator(stride=16)
+        self.anchor_gen = AnchorGenerator(stride=16) # stride must match backbone for correct anchor placement, used to map feature cell centers to image coordinates0
         self.rpn_head = RPNHead(backbone_out_channels, self.anchor_gen.num_anchors_per_location)
         self.rpn_cfg = rpn_cfg or RPNConfig()
         self.roi_cfg = roi_cfg or ROIConfig()
@@ -653,7 +653,7 @@ class MinimalFasterRCNN(nn.Module):
         labels[fg] = gt_labels[matched_idx[fg]]
 
         # Between thresholds is ignore for sampling.
-        return labels, matched_idx
+        return labels, matched_idx # shape: [P], [P]
 
     def _sample_labels(self, labels: Tensor, batch_size: int, positive_fraction: float) -> Tensor:
         """Balanced subsampling for positives and negatives.
